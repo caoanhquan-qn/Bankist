@@ -61,44 +61,43 @@ const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
-containerApp.style.opacity = "1";
-const displayMovement = function (val, i) {
-  const movement = document.createElement("div");
-  movement.classList.add("movements__row");
-  const child1 = document.createElement("div");
-  const child2 = document.createElement("div");
-  const child3 = document.createElement("div");
-  child1.classList.add("movements__type");
-  if (val > 0) {
-    child1.classList.add("movements__type--deposit");
-    child1.textContent = `${i + 3} deposit`;
-  } else {
-    child1.classList.add("movements__type--withdrawal");
-    child1.textContent = `${i + 3} withdrawal`;
-  }
-  child2.classList.add("movements__date");
-  child3.classList.add("movements__value");
-  child3.textContent = `${val} €`;
-  movement.appendChild(child1);
-  movement.appendChild(child2);
-  movement.appendChild(child3);
-  containerMovements.prepend(movement);
+let total = 0;
+let cashIn = 0;
+let cashOut = 0;
+
+const displayMovements = function (movements) {
+  containerMovements.innerHTML = "";
+  movements.forEach(function (value, index, _) {
+    const type = value > 0 ? "deposit" : "withdrawal";
+    const movementRow = `<div class="movements__row">
+    <div class="movements__type movements__type--${type}">${
+      index + 1
+    } ${type}</div>
+    <div class="movements__date">3 days ago</div>
+    <div class="movements__value">${value}€</div>`;
+
+    containerMovements.insertAdjacentHTML("afterbegin", movementRow);
+    total += value;
+    labelBalance.textContent = `${total} €`;
+    if (value > 0) {
+      cashIn += value;
+    } else if (value < 0) {
+      cashOut += value;
+    }
+    labelSumIn.textContent = cashIn;
+    labelSumOut.textContent = cashOut;
+  });
+};
+displayMovements(account1.movements);
+
+const username = function (string) {
+  const username = string
+    .split(" ")
+    .map((value) => value[0].toLowerCase())
+    .join("");
+  return username;
 };
 
-let total = 3622;
-let cashIn = 4000;
-let cashOut = -378;
-account1.movements.forEach(function (value, index, _) {
-  displayMovement(value, index);
-  total += value;
-  labelBalance.textContent = `${total} €`;
-  if (value > 0) {
-    cashIn += value;
-    console.log(value, cashIn);
-  } else if (value < 0) {
-    cashOut += value;
-    console.log(value, cashOut);
-  }
-  labelSumIn.textContent = cashIn;
-  labelSumOut.textContent = cashOut;
+accounts.forEach(function (acc) {
+  acc.username = username(acc.owner);
 });
