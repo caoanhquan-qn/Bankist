@@ -70,7 +70,7 @@ const displayMovements = function (movements) {
       index + 1
     } ${type}</div>
     <div class="movements__date">3 days ago</div>
-    <div class="movements__value">${value}€</div>`;
+    <div class="movements__value">${value} €</div>`;
     containerMovements.insertAdjacentHTML("afterbegin", movementRow);
   });
 };
@@ -88,24 +88,31 @@ const total = function (movements) {
 
 total(account1.movements);
 
-const cashIn = function (movements) {
+const displaySummary = function (movements) {
   const deposit = movements
     .filter((value) => value > 0)
     .reduce((accumulator, value) => accumulator + value, 0);
-  labelSumIn.textContent = deposit;
-};
+  labelSumIn.textContent = `${deposit} €`;
 
-cashIn(account1.movements);
-
-const cashOut = function (movements) {
   const withdrawal = movements
     .filter((value) => value < 0)
     .reduce((accumulator, value) => accumulator + value, 0);
 
-  labelSumOut.textContent = withdrawal;
+  labelSumOut.textContent = `${Math.abs(withdrawal)} €`;
 };
 
-cashOut(account1.movements);
+displaySummary(account1.movements);
+
+const interest = function (rate, movements) {
+  const surplus = movements
+    .filter((mov) => mov > 0)
+    .map((deposit) => (deposit * rate) / 100)
+    .filter((int) => int >= 1)
+    .reduce((acc, int) => acc + int, 0);
+  labelSumInterest.textContent = `${surplus} €`;
+};
+
+interest(account1.interestRate, account1.movements);
 
 const username = function (string) {
   const username = string
