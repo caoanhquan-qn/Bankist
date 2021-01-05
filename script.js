@@ -79,23 +79,33 @@ displayMovements(account1.movements);
 // functional programming
 
 const total = function (movements) {
-  return movements.reduce((accumulator, value) => accumulator + value, 0);
+  const balance = movements.reduce(
+    (accumulator, value) => accumulator + value,
+    0
+  );
+  labelBalance.textContent = `${balance} €`;
 };
-labelBalance.textContent = `${total(account1.movements)} €`;
+
+total(account1.movements);
 
 const cashIn = function (movements) {
-  return movements
+  const deposit = movements
     .filter((value) => value > 0)
     .reduce((accumulator, value) => accumulator + value, 0);
+  labelSumIn.textContent = deposit;
 };
-labelSumIn.textContent = cashIn(account1.movements);
+
+cashIn(account1.movements);
 
 const cashOut = function (movements) {
-  return movements
+  const withdrawal = movements
     .filter((value) => value < 0)
     .reduce((accumulator, value) => accumulator + value, 0);
+
+  labelSumOut.textContent = withdrawal;
 };
-labelSumOut.textContent = cashOut(account1.movements);
+
+cashOut(account1.movements);
 
 const username = function (string) {
   const username = string
