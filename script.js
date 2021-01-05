@@ -61,10 +61,6 @@ const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
-let total = 0;
-let cashIn = 0;
-let cashOut = 0;
-
 const displayMovements = function (movements) {
   containerMovements.innerHTML = "";
   movements.forEach(function (value, index, _) {
@@ -75,20 +71,31 @@ const displayMovements = function (movements) {
     } ${type}</div>
     <div class="movements__date">3 days ago</div>
     <div class="movements__value">${value}€</div>`;
-
     containerMovements.insertAdjacentHTML("afterbegin", movementRow);
-    total += value;
-    labelBalance.textContent = `${total} €`;
-    if (value > 0) {
-      cashIn += value;
-    } else if (value < 0) {
-      cashOut += value;
-    }
-    labelSumIn.textContent = cashIn;
-    labelSumOut.textContent = cashOut;
   });
 };
 displayMovements(account1.movements);
+
+// functional programming
+
+const total = function (movements) {
+  return movements.reduce((accumulator, value) => accumulator + value, 0);
+};
+labelBalance.textContent = `${total(account1.movements)} €`;
+
+const cashIn = function (movements) {
+  return movements
+    .filter((value) => value > 0)
+    .reduce((accumulator, value) => accumulator + value, 0);
+};
+labelSumIn.textContent = cashIn(account1.movements);
+
+const cashOut = function (movements) {
+  return movements
+    .filter((value) => value < 0)
+    .reduce((accumulator, value) => accumulator + value, 0);
+};
+labelSumOut.textContent = cashOut(account1.movements);
 
 const username = function (string) {
   const username = string
