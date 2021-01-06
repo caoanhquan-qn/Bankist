@@ -129,8 +129,8 @@ btnLogin.addEventListener("click", function (event) {
   event.preventDefault();
   const acc = accounts.find(
     (acc) =>
-      inputLoginUsername.value === acc.username &&
-      parseInt(inputLoginPin.value) === acc.pin
+      acc.username === inputLoginUsername.value &&
+      acc.pin === parseInt(inputLoginPin.value)
   );
 
   if (acc) {
@@ -139,7 +139,7 @@ btnLogin.addEventListener("click", function (event) {
     clearValue();
   } else {
     alert("The username or PIN that you've entered doesn't match any account");
-    window.location.reload();
+    clearValue();
   }
 });
 
@@ -147,5 +147,27 @@ btnLogin.addEventListener("click", function (event) {
 
 const btnLogout = document.querySelector(".logout__btn");
 btnLogout.addEventListener("click", function () {
-  window.location.reload();
+  containerApp.style.opacity = 0;
+  labelWelcome.textContent = "Log in to get started";
+});
+
+//implement transfer
+
+btnTransfer.addEventListener("click", function (event) {
+  event.preventDefault();
+  if (parseInt(inputTransferAmount.value) <= parseInt(labelBalance.innerText)) {
+    const currentAcc = accounts.find(
+      (acc) => acc.owner.split(" ")[0] === labelWelcome.innerText.slice(14, -1)
+    );
+    const acc = accounts.find((acc) => acc.username === inputTransferTo.value);
+    acc.movements.push(parseInt(inputTransferAmount.value));
+    currentAcc.movements.push(parseInt(inputTransferAmount.value) * -1);
+    displayAccount(currentAcc);
+    inputTransferTo.value = "";
+    inputTransferAmount.value = "";
+  } else {
+    alert("NOT ENOUGH MONEY");
+    inputTransferTo.value = "";
+    inputTransferAmount.value = "";
+  }
 });

@@ -66,9 +66,18 @@ nav {
   border-radius: 10rem;
   margin-right: 1rem;
   color: #fff;
-  background-color: red;
+  background-color: rgb(255, 0, 0);
   border: 1px solid #fff;
+  cursor: pointer;
   transition: all 0.3s;
+}
+.logout__btn:focus {
+  outline: none;
+  border: 1px solid #ccc;
+}
+.logout__btn:hover {
+  background-color: rgb(139, 0, 0);
+  transform: translateY(4px);
 }
 
 .login__input:focus {
