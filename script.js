@@ -61,9 +61,11 @@ const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
-const displayMovements = function (movements) {
+// functional programming
+
+const displayAccount = function (account) {
   containerMovements.innerHTML = "";
-  movements.forEach(function (value, index, _) {
+  account.movements.forEach(function (value, index) {
     const type = value > 0 ? "deposit" : "withdrawal";
     const movementRow = `<div class="movements__row">
     <div class="movements__type movements__type--${type}">${
@@ -73,38 +75,33 @@ const displayMovements = function (movements) {
     <div class="movements__value">${value} €</div>`;
     containerMovements.insertAdjacentHTML("afterbegin", movementRow);
   });
-};
 
-// functional programming
-
-const total = function (movements) {
-  const balance = movements.reduce(
+  const balance = account.movements.reduce(
     (accumulator, value) => accumulator + value,
     0
   );
   labelBalance.textContent = `${balance} €`;
-};
 
-const displaySummary = function (movements) {
-  const deposit = movements
+  const deposit = account.movements
     .filter((value) => value > 0)
     .reduce((accumulator, value) => accumulator + value, 0);
   labelSumIn.textContent = `${deposit} €`;
 
-  const withdrawal = movements
+  const withdrawal = account.movements
     .filter((value) => value < 0)
     .reduce((accumulator, value) => accumulator + value, 0);
 
   labelSumOut.textContent = `${Math.abs(withdrawal)} €`;
-};
 
-const interest = function (rate, movements) {
-  const surplus = movements
+  const surplus = account.movements
     .filter((mov) => mov > 0)
-    .map((deposit) => (deposit * rate) / 100)
+    .map((deposit) => (deposit * account.interestRate) / 100)
     .filter((int) => int >= 1)
     .reduce((acc, int) => acc + int, 0);
   labelSumInterest.textContent = `${surplus} €`;
+
+  const firstName = account.owner.split(" ")[0];
+  labelWelcome.textContent = `Welcome back, ${firstName}!`;
 };
 
 const username = function (string) {
@@ -113,11 +110,6 @@ const username = function (string) {
     .map((value) => value[0].toLowerCase())
     .join("");
   return username;
-};
-
-const message = function (account) {
-  const firstName = account.owner.split(" ")[0];
-  labelWelcome.textContent = `Welcome back, ${firstName}!`;
 };
 
 const clearValue = function () {
@@ -142,16 +134,12 @@ btnLogin.addEventListener("click", function (event) {
   );
 
   if (acc) {
-    message(acc);
-    displayMovements(acc.movements);
-    total(acc.movements);
-    displaySummary(acc.movements);
-    interest(acc.interestRate, acc.movements);
+    displayAccount(acc);
     containerApp.style.opacity = 1;
     clearValue();
   } else {
     alert("The username or PIN that you've entered doesn't match any account");
-    clearValue();
+    window.location.reload();
   }
 });
 
