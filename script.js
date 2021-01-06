@@ -115,6 +115,16 @@ const username = function (string) {
   return username;
 };
 
+const message = function (account) {
+  const firstName = account.owner.split(" ")[0];
+  labelWelcome.textContent = `Welcome back, ${firstName}!`;
+};
+
+const defaultValue = function () {
+  inputLoginUsername.value = "";
+  inputLoginPin.value = "";
+};
+
 accounts.forEach(function (acc) {
   acc.username = username(acc.owner);
 });
@@ -128,9 +138,17 @@ btnLogin.addEventListener("click", function (event) {
       inputLoginUsername.value === acc.username &&
       parseInt(inputLoginPin.value) === acc.pin
   );
-  displayMovements(acc.movements);
-  total(acc.movements);
-  displaySummary(acc.movements);
-  interest(acc.interestRate, acc.movements);
-  containerApp.style.opacity = "1";
+
+  if (acc) {
+    message(acc);
+    displayMovements(acc.movements);
+    total(acc.movements);
+    displaySummary(acc.movements);
+    interest(acc.interestRate, acc.movements);
+    containerApp.style.opacity = 1;
+    defaultValue();
+  } else {
+    alert("The username or PIN that you've entered doesn't match any account");
+    defaultValue();
+  }
 });
