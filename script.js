@@ -61,6 +61,10 @@ const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
+//logout button
+
+const btnLogout = document.querySelector(".logout__btn");
+
 // functional programming
 
 const displayAccount = function (account) {
@@ -102,6 +106,8 @@ const displayAccount = function (account) {
 
   const firstName = account.owner.split(" ")[0];
   labelWelcome.textContent = `Welcome back, ${firstName}!`;
+
+  btnLogout.style.display = "block";
 };
 
 const username = function (string) {
@@ -151,10 +157,10 @@ btnLogin.addEventListener("click", function (event) {
 
 // add logout button
 
-const btnLogout = document.querySelector(".logout__btn");
 btnLogout.addEventListener("click", function () {
   containerApp.style.opacity = 0;
   labelWelcome.textContent = "Log in to get started";
+  btnLogout.style.display = "none";
 });
 
 //implement transfer

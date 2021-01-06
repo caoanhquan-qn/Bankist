@@ -57,6 +57,7 @@ nav {
   transition: all 0.3s;
 }
 .logout__btn {
+  display: none;
   border: none;
   padding: 0.5rem 2rem;
   font-size: 1.6rem;
@@ -118,7 +119,7 @@ nav {
 
   /* NOTE This creates the fade in/out anumation */
   opacity: 0;
-  transition: all 1s;
+  transition: all 0.5s;
 }
 
 .balance {
