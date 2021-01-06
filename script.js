@@ -112,11 +112,16 @@ const username = function (string) {
   return username;
 };
 
-const clearValue = function () {
+const clearLoginValue = function () {
   inputLoginUsername.value = "";
   inputLoginPin.value = "";
   inputLoginUsername.blur();
   inputLoginPin.blur();
+};
+
+const clearTransferValue = function () {
+  inputTransferTo.value = "";
+  inputTransferAmount.value = "";
 };
 
 accounts.forEach(function (acc) {
@@ -124,22 +129,23 @@ accounts.forEach(function (acc) {
 });
 
 // event handler
+let currentAccount; // global variable
 
 btnLogin.addEventListener("click", function (event) {
   event.preventDefault();
-  const acc = accounts.find(
+  currentAccount = accounts.find(
     (acc) =>
       acc.username === inputLoginUsername.value &&
-      acc.pin === parseInt(inputLoginPin.value)
+      acc.pin === Number(inputLoginPin.value)
   );
 
-  if (acc) {
-    displayAccount(acc);
+  if (currentAccount) {
+    displayAccount(currentAccount);
     containerApp.style.opacity = 1;
-    clearValue();
+    clearLoginValue();
   } else {
     alert("The username or PIN that you've entered doesn't match any account");
-    clearValue();
+    clearLoginValue();
   }
 });
 
@@ -155,19 +161,26 @@ btnLogout.addEventListener("click", function () {
 
 btnTransfer.addEventListener("click", function (event) {
   event.preventDefault();
-  if (parseInt(inputTransferAmount.value) <= parseInt(labelBalance.innerText)) {
-    const currentAcc = accounts.find(
-      (acc) => acc.owner.split(" ")[0] === labelWelcome.innerText.slice(14, -1)
+  const amount = Number(inputTransferAmount.value);
+  if (amount <= parseInt(labelBalance.innerText)) {
+    const receivingAcc = accounts.find(
+      (acc) => acc.username === inputTransferTo.value
     );
-    const acc = accounts.find((acc) => acc.username === inputTransferTo.value);
-    acc.movements.push(parseInt(inputTransferAmount.value));
-    currentAcc.movements.push(parseInt(inputTransferAmount.value) * -1);
-    displayAccount(currentAcc);
-    inputTransferTo.value = "";
-    inputTransferAmount.value = "";
+    if (receivingAcc) {
+      if (amount <= 0 || typeof amount !== "number") {
+        alert("Invalid amount ⛔️⛔️⛔️!!!");
+      } else if (currentAccount.username === receivingAcc.username) {
+        alert("Invalid receiving account ⛔️⛔️⛔️!!!");
+      } else {
+        receivingAcc.movements.push(amount);
+        currentAccount.movements.push(amount * -1);
+        displayAccount(currentAccount);
+      }
+    } else {
+      alert("Receiving account doesn't exist ⛔️⛔️⛔️!!!");
+    }
   } else {
     alert("NOT ENOUGH MONEY");
-    inputTransferTo.value = "";
-    inputTransferAmount.value = "";
   }
+  clearTransferValue();
 });
