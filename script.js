@@ -130,11 +130,18 @@ const clearTransferValue = function () {
   inputTransferAmount.value = "";
 };
 
+const clearCloseValue = function () {
+  inputCloseUsername.value = "";
+  inputClosePin.value = "";
+};
+
 accounts.forEach(function (acc) {
   acc.username = username(acc.owner);
 });
 
 // event handler
+// implement login
+
 let currentAccount; // global variable
 
 btnLogin.addEventListener("click", function (event) {
@@ -189,4 +196,28 @@ btnTransfer.addEventListener("click", function (event) {
     alert("NOT ENOUGH MONEY");
   }
   clearTransferValue();
+});
+
+//implement close account
+
+btnClose.addEventListener("click", function (event) {
+  event.preventDefault();
+  if (
+    currentAccount.username === inputCloseUsername.value &&
+    currentAccount.pin === Number(inputClosePin.value)
+  ) {
+    const indexCurrentAccount = accounts.findIndex(
+      (acc) =>
+        acc.username === currentAccount.username &&
+        acc.pin === currentAccount.pin
+    );
+    accounts.splice(indexCurrentAccount, 1);
+    containerApp.style.opacity = 0;
+    labelWelcome.textContent = "Log in to get started";
+    btnLogout.style.display = "none";
+    alert("You closed the account successfully 👍👍👍!!!");
+  } else {
+    alert("Invalid confirmation ⛔️⛔️⛔️!!!");
+  }
+  clearCloseValue();
 });
