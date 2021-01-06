@@ -74,7 +74,6 @@ const displayMovements = function (movements) {
     containerMovements.insertAdjacentHTML("afterbegin", movementRow);
   });
 };
-displayMovements(account1.movements);
 
 // functional programming
 
@@ -85,8 +84,6 @@ const total = function (movements) {
   );
   labelBalance.textContent = `${balance} €`;
 };
-
-total(account1.movements);
 
 const displaySummary = function (movements) {
   const deposit = movements
@@ -101,8 +98,6 @@ const displaySummary = function (movements) {
   labelSumOut.textContent = `${Math.abs(withdrawal)} €`;
 };
 
-displaySummary(account1.movements);
-
 const interest = function (rate, movements) {
   const surplus = movements
     .filter((mov) => mov > 0)
@@ -111,8 +106,6 @@ const interest = function (rate, movements) {
     .reduce((acc, int) => acc + int, 0);
   labelSumInterest.textContent = `${surplus} €`;
 };
-
-interest(account1.interestRate, account1.movements);
 
 const username = function (string) {
   const username = string
@@ -124,4 +117,20 @@ const username = function (string) {
 
 accounts.forEach(function (acc) {
   acc.username = username(acc.owner);
+});
+
+// event handler
+
+btnLogin.addEventListener("click", function (event) {
+  event.preventDefault();
+  const acc = accounts.find(
+    (acc) =>
+      inputLoginUsername.value === acc.username &&
+      parseInt(inputLoginPin.value) === acc.pin
+  );
+  displayMovements(acc.movements);
+  total(acc.movements);
+  displaySummary(acc.movements);
+  interest(acc.interestRate, acc.movements);
+  containerApp.style.opacity = "1";
 });
