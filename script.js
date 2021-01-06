@@ -120,9 +120,11 @@ const message = function (account) {
   labelWelcome.textContent = `Welcome back, ${firstName}!`;
 };
 
-const defaultValue = function () {
+const clearValue = function () {
   inputLoginUsername.value = "";
   inputLoginPin.value = "";
+  inputLoginUsername.blur();
+  inputLoginPin.blur();
 };
 
 accounts.forEach(function (acc) {
@@ -146,9 +148,16 @@ btnLogin.addEventListener("click", function (event) {
     displaySummary(acc.movements);
     interest(acc.interestRate, acc.movements);
     containerApp.style.opacity = 1;
-    defaultValue();
+    clearValue();
   } else {
     alert("The username or PIN that you've entered doesn't match any account");
-    defaultValue();
+    clearValue();
   }
+});
+
+// add logout button
+
+const btnLogout = document.querySelector(".logout__btn");
+btnLogout.addEventListener("click", function () {
+  window.location.reload();
 });
