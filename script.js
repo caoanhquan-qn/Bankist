@@ -65,6 +65,9 @@ const inputClosePin = document.querySelector(".form__input--pin");
 
 const btnLogout = document.querySelector(".logout__btn");
 
+// implement sorting
+let counter = 0;
+
 // functional programming
 
 const displayAccount = function (account) {
@@ -123,6 +126,7 @@ const clearLoginValue = function () {
   inputLoginPin.value = "";
   inputLoginUsername.blur();
   inputLoginPin.blur();
+  counter = 0;
 };
 
 const clearTransferValue = function () {
@@ -159,11 +163,10 @@ btnLogin.addEventListener("click", function (event) {
   if (currentAccount) {
     displayAccount(currentAccount);
     containerApp.style.opacity = 1;
-    clearLoginValue();
   } else {
     alert("The username or PIN that you've entered doesn't match any account");
-    clearLoginValue();
   }
+  clearLoginValue();
 });
 
 // add logout button
@@ -250,15 +253,11 @@ btnLoan.addEventListener("click", function (event) {
 
 // sorting
 
-let counter = 0;
 btnSort.addEventListener("click", function (event) {
   event.preventDefault();
   const sortedMovements = [...currentAccount.movements].sort((a, b) => a - b);
   const currentAccountCopy = { ...currentAccount };
-  console.log(currentAccountCopy);
   currentAccountCopy.movements = sortedMovements;
-  console.log(currentAccountCopy);
-  console.log(currentAccount);
   counter++;
   if (counter % 2 === 1) {
     displayAccount(currentAccountCopy);
