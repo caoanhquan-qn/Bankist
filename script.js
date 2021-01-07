@@ -66,13 +66,16 @@ const inputClosePin = document.querySelector(".form__input--pin");
 const btnLogout = document.querySelector(".logout__btn");
 
 // implement sorting
-let counter = 0;
+// let counter = 0;
 
 // functional programming
 
-const displayAccount = function (account) {
+const displayAccount = function (account, sort = false) {
   containerMovements.innerHTML = "";
-  account.movements.forEach(function (value, index) {
+  const movs = sort
+    ? account.movements.slice().sort((a, b) => a - b)
+    : account.movements;
+  movs.forEach(function (value, index) {
     const type = value > 0 ? "deposit" : "withdrawal";
     const movementRow = `<div class="movements__row">
     <div class="movements__type movements__type--${type}">${
@@ -126,7 +129,7 @@ const clearLoginValue = function () {
   inputLoginPin.value = "";
   inputLoginUsername.blur();
   inputLoginPin.blur();
-  counter = 0;
+  // counter = 0;
 };
 
 const clearTransferValue = function () {
@@ -253,15 +256,22 @@ btnLoan.addEventListener("click", function (event) {
 
 // sorting
 
+// btnSort.addEventListener("click", function (event) {
+//   event.preventDefault();
+//   const sortedMovements = [...currentAccount.movements].sort((a, b) => a - b);
+//   const currentAccountCopy = { ...currentAccount };
+//   currentAccountCopy.movements = sortedMovements;
+//   counter++;
+//   if (counter % 2 === 1) {
+//     displayAccount(currentAccountCopy);
+//   } else {
+//     displayAccount(currentAccount);
+//   }
+// });
+
+let sorted = false;
 btnSort.addEventListener("click", function (event) {
   event.preventDefault();
-  const sortedMovements = [...currentAccount.movements].sort((a, b) => a - b);
-  const currentAccountCopy = { ...currentAccount };
-  currentAccountCopy.movements = sortedMovements;
-  counter++;
-  if (counter % 2 === 1) {
-    displayAccount(currentAccountCopy);
-  } else {
-    displayAccount(currentAccount);
-  }
+  displayAccount(currentAccount, !sorted);
+  sorted = !sorted;
 });
