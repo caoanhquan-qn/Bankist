@@ -247,3 +247,22 @@ btnLoan.addEventListener("click", function (event) {
 
   clearLoanValue();
 });
+
+// sorting
+
+let counter = 0;
+btnSort.addEventListener("click", function (event) {
+  event.preventDefault();
+  const sortedMovements = [...currentAccount.movements].sort((a, b) => a - b);
+  const currentAccountCopy = { ...currentAccount };
+  console.log(currentAccountCopy);
+  currentAccountCopy.movements = sortedMovements;
+  console.log(currentAccountCopy);
+  console.log(currentAccount);
+  counter++;
+  if (counter % 2 === 1) {
+    displayAccount(currentAccountCopy);
+  } else {
+    displayAccount(currentAccount);
+  }
+});
