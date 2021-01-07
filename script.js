@@ -135,6 +135,10 @@ const clearCloseValue = function () {
   inputClosePin.value = "";
 };
 
+const clearLoanValue = function () {
+  inputLoanAmount.value = "";
+};
+
 accounts.forEach(function (acc) {
   acc.username = username(acc.owner);
 });
@@ -220,4 +224,26 @@ btnClose.addEventListener("click", function (event) {
     alert("Invalid confirmation ⛔️⛔️⛔️!!!");
   }
   clearCloseValue();
+});
+
+// implement request loan
+
+btnLoan.addEventListener("click", function (event) {
+  event.preventDefault();
+  const loanAmout = Number(inputLoanAmount.value);
+  const deposit = currentAccount.movements.filter((mov) => mov > 0);
+  const checkedCondition = deposit.some((mov) => mov >= loanAmout * 0.1);
+  if (loanAmout > 0) {
+    if (checkedCondition) {
+      currentAccount.movements.push(loanAmout);
+      alert("You are granted this loan 🎉🎉🎉!!!");
+      displayAccount(currentAccount);
+    } else {
+      alert("You are ineligible for this loan 😟😟😟!!!");
+    }
+  } else {
+    alert("Invalid amount ⛔️⛔️⛔️!!!");
+  }
+
+  clearLoanValue();
 });
