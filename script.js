@@ -208,6 +208,7 @@ let currentAccount; // global variable
 
 btnLogin.addEventListener("click", function (event) {
   event.preventDefault();
+  labelDate.textContent = new Date().toLocaleString();
   currentAccount = accounts.find(
     (acc) =>
       acc.username === inputLoginUsername.value &&
