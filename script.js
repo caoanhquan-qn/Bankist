@@ -44,7 +44,6 @@ const account2 = {
   ],
   currency: "USD",
   locale: "en-US",
-  currencySymbol: "$",
 };
 
 const account3 = {
@@ -65,7 +64,6 @@ const account3 = {
   ],
   currency: "AUD",
   locale: "en-AU",
-  currencySymbol: "$",
 };
 
 const account4 = {
@@ -83,7 +81,6 @@ const account4 = {
   ],
   currency: "CNY",
   locale: "zh-CN",
-  currencySymbol: "¥",
 };
 
 const accounts = [account1, account2, account3, account4];
@@ -129,17 +126,41 @@ function calcDaysPassed(date1, date2) {
 
 // functional programming
 
+// display account
+
 const displayAccount = function (account, sort = false) {
   containerMovements.innerHTML = "";
   const movs = sort
     ? account.movements.slice().sort((a, b) => a - b)
     : account.movements;
+
+  // format currency
+  const formattedCurrency = {
+    style: "currency",
+    currency: account.currency,
+  };
+
+  // format date time
+
+  const formattedDateTime = {
+    hour: "numeric",
+    minute: "numeric",
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+  };
+
+  // forEach on movements
+
   movs.forEach(function (value, index) {
     const type = value > 0 ? "deposit" : "withdrawal";
     const daysPassed = calcDaysPassed(
       new Date(),
       new Date(account.movementsDates[index])
     );
+
+    // format transaction date
+
     let transactionDate;
     if (daysPassed === 0) {
       transactionDate = "TODAY";
@@ -152,53 +173,74 @@ const displayAccount = function (account, sort = false) {
         new Date(account.movementsDates[index])
       );
     }
+
+    // display movements
+
     const movementRow = `<div class="movements__row">
     <div class="movements__type movements__type--${type}">${
       index + 1
     } ${type}</div>
     <div class="movements__date">${transactionDate}</div>
-    <div class="movements__value">${value.toFixed(2)} ${
-      account.currencySymbol
-    }</div>`;
+    <div class="movements__value">${new Intl.NumberFormat(
+      account.locale,
+      formattedCurrency
+    ).format(value.toFixed(2))}</div>`;
     containerMovements.insertAdjacentHTML("afterbegin", movementRow);
   });
+
+  // display balance
 
   const balance = account.movements.reduce(
     (accumulator, value) => accumulator + value,
     0
   );
-  labelBalance.textContent = `${balance.toFixed(2)} ${account.currencySymbol}`;
+  labelBalance.textContent = `${new Intl.NumberFormat(
+    account.locale,
+    formattedCurrency
+  ).format(balance.toFixed(2))}`;
+
+  // display deposit
 
   const deposit = account.movements
     .filter((value) => value > 0)
     .reduce((accumulator, value) => accumulator + value, 0);
-  labelSumIn.textContent = `${deposit.toFixed(2)} ${account.currencySymbol}`;
+  labelSumIn.textContent = `${new Intl.NumberFormat(
+    account.locale,
+    formattedCurrency
+  ).format(deposit.toFixed(2))}`;
+
+  // display cashout
 
   const withdrawal = account.movements
     .filter((value) => value < 0)
     .reduce((accumulator, value) => accumulator + value, 0);
 
-  labelSumOut.textContent = `${Math.abs(withdrawal).toFixed(2)} ${
-    account.currencySymbol
-  }`;
+  labelSumOut.textContent = `${new Intl.NumberFormat(
+    account.locale,
+    formattedCurrency
+  ).format(Math.abs(withdrawal).toFixed(2))}`;
+
+  // display interest
 
   const surplus = account.movements
     .filter((mov) => mov > 0)
     .map((deposit) => (deposit * account.interestRate) / 100)
     .filter((int) => int >= 1)
     .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = `${surplus.toFixed(2)} ${
-    account.currencySymbol
-  }`;
+  labelSumInterest.textContent = `${new Intl.NumberFormat(
+    account.locale,
+    formattedCurrency
+  ).format(surplus.toFixed(2))}`;
 
   const firstName = account.owner.split(" ")[0];
   labelWelcome.textContent = `Welcome back, ${firstName}!`;
 
   btnLogout.style.display = "block";
 
-  labelDate.textContent = new Intl.DateTimeFormat(account.locale).format(
-    new Date()
-  );
+  labelDate.textContent = new Intl.DateTimeFormat(
+    account.locale,
+    formattedDateTime
+  ).format(new Date());
 };
 
 const username = function (string) {
@@ -268,6 +310,18 @@ btnLogout.addEventListener("click", function () {
 
 //implement transfer
 
+function convert(account, value) {
+  if (
+    account.currency === "USD" ||
+    account.currency === "AUD" ||
+    account.currency === "CNY"
+  ) {
+    return Number(value.slice(1).replaceAll(",", ""));
+  } else if (account.currency === "EUR") {
+    return Number.parseFloat(value);
+  }
+}
+
 function addTransaction(account, num) {
   account.movements.push(num);
   account.movementsDates.push(new Date().toISOString());
@@ -276,7 +330,7 @@ function addTransaction(account, num) {
 btnTransfer.addEventListener("click", function (event) {
   event.preventDefault();
   const amount = Number(inputTransferAmount.value);
-  if (amount <= parseInt(labelBalance.innerText)) {
+  if (amount <= convert(currentAccount, labelBalance.textContent)) {
     const receivingAcc = accounts.find(
       (acc) => acc.username === inputTransferTo.value
     );
