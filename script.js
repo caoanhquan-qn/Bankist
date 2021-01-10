@@ -124,7 +124,13 @@ function calcDaysPassed(date1, date2) {
   return daysPassed;
 }
 
-// functional programming
+// format currency
+function formattedCurrency(value, locale, currency) {
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: currency,
+  }).format(value);
+}
 
 // display account
 
@@ -133,12 +139,6 @@ const displayAccount = function (account, sort = false) {
   const movs = sort
     ? account.movements.slice().sort((a, b) => a - b)
     : account.movements;
-
-  // format currency
-  const formattedCurrency = {
-    style: "currency",
-    currency: account.currency,
-  };
 
   // format date time
 
@@ -181,33 +181,36 @@ const displayAccount = function (account, sort = false) {
       index + 1
     } ${type}</div>
     <div class="movements__date">${transactionDate}</div>
-    <div class="movements__value">${new Intl.NumberFormat(
+    <div class="movements__value">${formattedCurrency(
+      value,
       account.locale,
-      formattedCurrency
-    ).format(value.toFixed(2))}</div>`;
+      account.currency
+    )}</div>`;
     containerMovements.insertAdjacentHTML("afterbegin", movementRow);
   });
 
   // display balance
 
-  const balance = account.movements.reduce(
+  account.balance = account.movements.reduce(
     (accumulator, value) => accumulator + value,
     0
   );
-  labelBalance.textContent = `${new Intl.NumberFormat(
+  labelBalance.textContent = formattedCurrency(
+    account.balance,
     account.locale,
-    formattedCurrency
-  ).format(balance.toFixed(2))}`;
+    account.currency
+  );
 
   // display deposit
 
   const deposit = account.movements
     .filter((value) => value > 0)
     .reduce((accumulator, value) => accumulator + value, 0);
-  labelSumIn.textContent = `${new Intl.NumberFormat(
+  labelSumIn.textContent = formattedCurrency(
+    deposit,
     account.locale,
-    formattedCurrency
-  ).format(deposit.toFixed(2))}`;
+    account.currency
+  );
 
   // display cashout
 
@@ -215,10 +218,11 @@ const displayAccount = function (account, sort = false) {
     .filter((value) => value < 0)
     .reduce((accumulator, value) => accumulator + value, 0);
 
-  labelSumOut.textContent = `${new Intl.NumberFormat(
+  labelSumOut.textContent = formattedCurrency(
+    Math.abs(withdrawal),
     account.locale,
-    formattedCurrency
-  ).format(Math.abs(withdrawal).toFixed(2))}`;
+    account.currency
+  );
 
   // display interest
 
@@ -227,10 +231,11 @@ const displayAccount = function (account, sort = false) {
     .map((deposit) => (deposit * account.interestRate) / 100)
     .filter((int) => int >= 1)
     .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = `${new Intl.NumberFormat(
+  labelSumInterest.textContent = formattedCurrency(
+    surplus,
     account.locale,
-    formattedCurrency
-  ).format(surplus.toFixed(2))}`;
+    account.currency
+  );
 
   const firstName = account.owner.split(" ")[0];
   labelWelcome.textContent = `Welcome back, ${firstName}!`;
@@ -310,18 +315,6 @@ btnLogout.addEventListener("click", function () {
 
 //implement transfer
 
-function convert(account, value) {
-  if (
-    account.currency === "USD" ||
-    account.currency === "AUD" ||
-    account.currency === "CNY"
-  ) {
-    return Number(value.slice(1).replaceAll(",", ""));
-  } else if (account.currency === "EUR") {
-    return Number.parseFloat(value);
-  }
-}
-
 function addTransaction(account, num) {
   account.movements.push(num);
   account.movementsDates.push(new Date().toISOString());
@@ -329,8 +322,8 @@ function addTransaction(account, num) {
 
 btnTransfer.addEventListener("click", function (event) {
   event.preventDefault();
-  const amount = Number(inputTransferAmount.value);
-  if (amount <= convert(currentAccount, labelBalance.textContent)) {
+  const amount = +inputTransferAmount.value;
+  if (amount <= currentAccount.balance) {
     const receivingAcc = accounts.find(
       (acc) => acc.username === inputTransferTo.value
     );
