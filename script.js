@@ -132,23 +132,61 @@ function formattedCurrency(value, locale, currency) {
   }).format(value);
 }
 
+// format date time
+
+const formattedDateTime = {
+  hour: "numeric",
+  minute: "numeric",
+  second: "numeric",
+  day: "numeric",
+  month: "numeric",
+  year: "numeric",
+};
+
+//imnplement timer
+
+function startLogOutTimer() {
+  let timer = 300;
+  const tick = function () {
+    const minutes = String(parseInt(timer / 60)).padStart(2, 0);
+    const seconds = String(parseInt(timer % 60)).padStart(2, 0);
+
+    labelTimer.textContent = `${minutes}:${seconds}`;
+
+    if (timer === 0) {
+      clearInterval(timerId);
+      containerApp.style.opacity = 0;
+      labelWelcome.textContent = "Log in to get started";
+      btnLogout.style.display = "none";
+    }
+    timer--;
+  };
+  tick();
+  const timerId = setInterval(tick, 1000);
+  return timerId;
+}
+
+// show time
+function showTime(account) {
+  const tick = function () {
+    labelDate.textContent = new Intl.DateTimeFormat(
+      account.locale,
+      formattedDateTime
+    ).format(new Date());
+  };
+  tick();
+  const showTimeId = setInterval(tick, 1000);
+  return showTimeId;
+}
+
 // display account
+let showTimeID;
 
 const displayAccount = function (account, sort = false) {
   containerMovements.innerHTML = "";
   const movs = sort
     ? account.movements.slice().sort((a, b) => a - b)
     : account.movements;
-
-  // format date time
-
-  const formattedDateTime = {
-    hour: "numeric",
-    minute: "numeric",
-    day: "numeric",
-    month: "numeric",
-    year: "numeric",
-  };
 
   // forEach on movements
 
@@ -242,10 +280,8 @@ const displayAccount = function (account, sort = false) {
 
   btnLogout.style.display = "block";
 
-  labelDate.textContent = new Intl.DateTimeFormat(
-    account.locale,
-    formattedDateTime
-  ).format(new Date());
+  if (showTimeID) clearInterval(showTimeID);
+  showTimeID = showTime(account);
 };
 
 const username = function (string) {
@@ -285,7 +321,7 @@ accounts.forEach(function (acc) {
 // event handler
 // implement login
 
-let currentAccount; // global variable
+let currentAccount, timer; // global variable
 
 btnLogin.addEventListener("click", function (event) {
   event.preventDefault();
@@ -297,6 +333,8 @@ btnLogin.addEventListener("click", function (event) {
   );
 
   if (currentAccount) {
+    if (timer) clearInterval(timer);
+    timer = startLogOutTimer();
     displayAccount(currentAccount);
     containerApp.style.opacity = 1;
   } else {
@@ -344,6 +382,9 @@ btnTransfer.addEventListener("click", function (event) {
     alert("NOT ENOUGH MONEY");
   }
   clearTransferValue();
+  // reset timer
+  clearInterval(timer);
+  timer = startLogOutTimer();
 });
 
 //implement close account
@@ -374,17 +415,23 @@ btnClose.addEventListener("click", function (event) {
 
 btnLoan.addEventListener("click", function (event) {
   event.preventDefault();
-  const loanAmout = Number(inputLoanAmount.value);
+  const loanAmout = +inputLoanAmount.value;
   const deposit = currentAccount.movements.filter((mov) => mov > 0);
   const checkedCondition = deposit.some((mov) => mov >= loanAmout * 0.1);
   if (loanAmout > 0) {
-    if (checkedCondition) {
-      addTransaction(currentAccount, loanAmout);
-      alert("You are granted this loan 🎉🎉🎉!!!");
-      displayAccount(currentAccount);
-    } else {
-      alert("You are ineligible for this loan 😟😟😟!!!");
-    }
+    setTimeout(function () {
+      if (checkedCondition) {
+        addTransaction(currentAccount, loanAmout);
+        alert("You are granted this loan 🎉🎉🎉!!!");
+        displayAccount(currentAccount);
+
+        //reset timer
+        clearInterval(timer);
+        timer = startLogOutTimer();
+      } else {
+        alert("You are ineligible for this loan 😟😟😟!!!");
+      }
+    }, 2000);
   } else {
     alert("Invalid amount ⛔️⛔️⛔️!!!");
   }
